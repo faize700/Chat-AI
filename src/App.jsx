@@ -1,6 +1,6 @@
-import { useState } from "react";
-import "./App.css"; // Make sure to import your CSS file where you define styles
-import 'animate.css';
+import { useEffect, useState } from "react";
+import "./App.css";
+import "animate.css";
 import axios from "axios";
 import ReactMarkdown from "react-markdown";
 import DarkModeToggle from "./components/DarkModeToggle";
@@ -10,6 +10,38 @@ function App() {
   const [answer, setAnswer] = useState("");
   const [generatingAnswer, setGeneratingAnswer] = useState(false);
   const [buttonAnimation, setButtonAnimation] = useState(false);
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  const listItems = [
+    "🤖 ASK ANYTHING",
+    "💬 General Chat",
+    "💻 Programming",
+    "🎨 Design",
+    "📱 Technology Trends",
+    "📚 Literature",
+    "🌍 World News",
+    "🎥 Entertainment",
+    "🍔 Food & Recipes",
+    "🏋️‍♂️ Fitness & Health",
+    "🎵 Music",
+    "🎮 Gaming",
+    "💼 Business & Entrepreneurship",
+    "🧠 Science & Technology",
+    "🛍️ Shopping & Fashion",
+    "🌿 Environment & Sustainability",
+    "🌌 Space Exploration",
+    "🎭 Arts & Culture",
+    "🚗 Automotive",
+    "🏞️ Travel & Adventure",
+  ];
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentIndex((prevIndex) => (prevIndex + 1) % listItems.length);
+    }, 5000); // Change item every 5 seconds
+
+    return () => clearInterval(interval);
+  }, [listItems.length]);
 
   async function generateAnswer(e) {
     setGeneratingAnswer(true);
@@ -33,6 +65,7 @@ function App() {
 
     setGeneratingAnswer(false);
     setButtonAnimation(false); // Reset button animation
+    setQuestion(""); // Clear the question text field
   }
 
   return (
@@ -48,19 +81,35 @@ function App() {
             target="_blank"
             rel="noopener noreferrer"
             className="block font-extrabold text-3xl md:text-5xl bg-clip-text bg-gradient-to-r from-slate-200/60 to-50% to-slate-200 dark:text-white text-black text-center mb-4"
+            style={{
+              background:
+                "linear-gradient(to right, var(--primary), var(--secondary))",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+            }}
           >
             AI CHAT APP
-            <span className="text-indigo-500 inline-flex flex-col h-[calc(theme(fontSize.4xl)*theme(lineHeight.tight))] md:h-[calc(theme(fontSize.5xl)*theme(lineHeight.tight))] overflow-hidden items-center">
-              {/* <ul className="block animate-text-slide-4 text-center leading-tight [&_li]:block"> */}
-              <ul>
-                <li className="animate__animated animate__backInDown animate___repeat-1 animate__backOutDown animate__delay-5s">🤖 ASK ANYTHING</li>
-                <li className="animate__animated animate__backInRight animate___repeat-1 animate__delay-5s">💻 Code Related</li>
-                <li>💰 Finance Sector</li>
-                <li>🩺 Health Related</li>
-                <li aria-hidden="true">🤖 ASK ANYTHING</li>
-              </ul>
-            </span>
           </a>
+          <div className="relative h-[calc(theme(fontSize.4xl)*theme(lineHeight.tight))] md:h-[calc(theme(fontSize.5xl)*theme(lineHeight.tight))] overflow-hidden block font-extrabold text-3xl md:text-5xl bg-clip-text bg-gradient-to-r from-slate-200/60 to-50% to-slate-200 dark:text-white text-black text-center mb-4">
+            <ul className="absolute w-full list-items">
+              {listItems.map((item, index) => (
+                <li
+                  key={index}
+                  className={`absolute w-full text-center ${
+                    currentIndex === index
+                      ? index % 2 === 0
+                        ? "even"
+                        : "odd"
+                      : ""
+                  }`}
+                  style={{ animationDuration: "5s" }}
+                >
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </div>
+
           <div className="w-full max-w-[54rem] relative flex items-center shadow-[6px_6px_10px_-1px_rgba(0,0,0,0.15)] justify-between mx-auto sm:w-[90%] md:w-[80%] lg:w-[70%] xl:w-[60%] mb-4">
             <textarea
               required
@@ -73,7 +122,6 @@ function App() {
             {generatingAnswer && (
               <svg
                 className="absolute right-4 top-1/2 transform -translate-y-1/2"
-                // style={{ transform: "translateX(-40px)" }}
                 width="40"
                 height="30"
                 viewBox="0 0 256 128"
